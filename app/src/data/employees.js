@@ -1,3 +1,6 @@
+// WARNING: Intentional IDOR vulnerability for security testing.
+// This will be fixed in a later stage of the project.
+
 const employees = [
   {
     id: 1,
