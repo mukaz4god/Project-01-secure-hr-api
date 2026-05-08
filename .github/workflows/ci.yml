@@ -1,0 +1,14 @@
+name: CI Pipeline
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  gitleaks:
+    uses: ./.github/workflows/reusable-gitleaks.yml
+
+  semgrep:
+    uses: ./.github/workflows/reusable-semgrep.yml

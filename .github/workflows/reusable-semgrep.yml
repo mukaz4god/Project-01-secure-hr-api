@@ -1,0 +1,16 @@
+name: Reusable Semgrep
+
+on: 
+  workflow_call:
+
+jobs:
+  semgrep:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+      
+      - name: Run Semgrep
+        uses: returntocorp/semgrep-action@v1
+        with: 
+          config: 'p/owasp-top-ten'
