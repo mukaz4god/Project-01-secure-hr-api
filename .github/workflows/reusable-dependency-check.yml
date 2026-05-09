@@ -15,7 +15,7 @@ jobs:
         with:
           project: 'secure-hr-api'
           path: app
-          format: 'HMTL'
+          format: HMTL
           out: 'reports'
 
       - name: Upload Dependency Check Report
