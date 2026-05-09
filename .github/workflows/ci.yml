@@ -12,3 +12,9 @@ jobs:
 
   semgrep:
     uses: ./.github/workflows/reusable-semgrep.yml
+
+  dependency-check:
+    uses: ./.github/workflows/reusable-dependency-check.yml
+
+  trivy:
+    uses: ./.github/workflows/reusable-trivy.yml
