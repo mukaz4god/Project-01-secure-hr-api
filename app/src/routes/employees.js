@@ -4,6 +4,14 @@ const authenticate = require("../middleware/auth");
 
 const router = express.Router();
 
+function canAccessEmployee(requestingUser, targetEmployee) {
+  const isSelf = requestingUser.id === targetEmployee.id;
+  const isManagerOfEmployee = targetEmployee.managerId === requestingUser.id;
+  const isPrivilegedRole = ["hr", "admin"].includes(requestingUser.role);
+
+  return isSelf || isManagerOfEmployee || isPrivilegedRole;
+}
+
 router.get("/employees/:id", authenticate, (req, res) => {
   const employeeId = Number(req.params.id);
   const employee = employees.find((item) => item.id === employeeId);
@@ -12,8 +20,12 @@ router.get("/employees/:id", authenticate, (req, res) => {
     return res.status(404).json({ error: "Employee not found" });
   }
 
-  // INTENTIONAL VULNERABILITY:
-  // Any authenticated user can access any employee record by changing the ID.
+  if (!canAccessEmployee(req.user, employee)) {
+    return res.status(403).json({
+      error: "Forbidden: insufficient permission to access this employee record"
+    });
+  }
+
   return res.json(employee);
 });
 
