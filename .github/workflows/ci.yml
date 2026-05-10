@@ -18,3 +18,6 @@ jobs:
 
   trivy:
     uses: ./.github/workflows/reusable-trivy.yml
+
+  tests:
+    uses: ./.github/workflows/reusable-node-tests.yml
