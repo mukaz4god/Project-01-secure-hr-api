@@ -1,14 +1,42 @@
 const express = require("express");
+const jwt = require("jsonwebtoken");
+const bcrypt = require("bcryptjs");
+const users = require("../data/users");
 
 const router = express.Router();
 
-router.post("/login-demo", (req, res) => {
-  return res.json({
-    message: "Demo login only. Use headers x-user-id and x-user-role.",
-    exampleHeaders: {
-      "x-user-id": "1",
-      "x-user-role": "employee"
+const JWT_SECRET = process.env.JWT_SECRET || "dev-only-secret-change-me";
+
+router.post("/login", async (req, res) => {
+  const { username, password } = req.body;
+
+  const user = users.find((item) => item.username === username);
+
+  if (!user) {
+    return res.status(401).json({ error: "Invalid username or password" });
+  }
+
+  const passwordValid = await bcrypt.compare(password, user.passwordHash);
+
+  if (!passwordValid) {
+    return res.status(401).json({ error: "Invalid username or password" });
+  }
+
+  const token = jwt.sign(
+    {
+      sub: String(user.id),
+      role: user.role
+    },
+    JWT_SECRET,
+    {
+      expiresIn: "15m",
+      issuer: "secure-hr-api"
     }
+  );
+
+  return res.json({
+    accessToken: token,
+    tokenType: "Bearer"
   });
 });
 
