@@ -5,7 +5,8 @@ const users = require("../data/users");
 
 const router = express.Router();
 
-const JWT_SECRET = process.env.JWT_SECRET || "dev-only-secret-change-me";
+//const JWT_SECRET = process.env.JWT_SECRET || "dev-only-secret-change-me";
+const { getJwtSecret } = require("../config/security");
 
 router.post("/login", async (req, res) => {
   const { username, password } = req.body;
@@ -27,7 +28,7 @@ router.post("/login", async (req, res) => {
       sub: String(user.id),
       role: user.role
     },
-    JWT_SECRET,
+    getJwtSecret(),
     {
       expiresIn: "15m",
       issuer: "secure-hr-api"

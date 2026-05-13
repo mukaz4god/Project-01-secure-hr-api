@@ -1,3 +1,5 @@
+process.env.JWT_SECRET = "test-secret-change-me-32-characters";
+
 const request = require("supertest");
 const app = require("../src/server");
 
