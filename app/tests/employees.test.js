@@ -77,3 +77,23 @@ describe("Employee access control with JWT authentication", () => {
     expect(response.statusCode).toBe(401);
   });
 });
+
+test("login endpoint rate limits repeated failed attempts", async () => {
+  for (let i = 0; i < 6; i++) {
+    await request(app)
+      .post("/api/login")
+      .send({
+        username: "alice",
+        password: "wrong-password"
+      });
+  }
+
+  const response = await request(app)
+    .post("/api/login")
+    .send({
+      username: "alice",
+      password: "wrong-password"
+    });
+
+  expect(response.statusCode).toBe(429);
+});

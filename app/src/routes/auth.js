@@ -4,11 +4,12 @@ const bcrypt = require("bcryptjs");
 const users = require("../data/users");
 
 const router = express.Router();
+const loginRateLimiter = require("../middleware/loginRateLimiter");
 
 //const JWT_SECRET = process.env.JWT_SECRET || "dev-only-secret-change-me";
 const { getJwtSecret } = require("../config/security");
 
-router.post("/login", async (req, res) => {
+router.post("/login", loginRateLimiter, async (req, res) => {
   const { username, password } = req.body;
 
   const user = users.find((item) => item.username === username);
