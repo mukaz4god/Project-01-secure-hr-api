@@ -1,0 +1,6 @@
+interview_saying.md
+security/reports/
+# .terraform.lock.hcl - consider not ignoring .terraform.lock.hcl for normal Terraform projects; it is usually safe and recommended to commit. But the important one is .terraform/:
+.terraform/
+*.tfstate
+*.tfstate.*

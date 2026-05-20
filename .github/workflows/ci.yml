@@ -1,0 +1,23 @@
+name: CI Pipeline
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  gitleaks:
+    uses: ./.github/workflows/reusable-gitleaks.yml
+
+  semgrep:
+    uses: ./.github/workflows/reusable-semgrep.yml
+
+  dependency-check:
+    uses: ./.github/workflows/reusable-dependency-check.yml
+
+  trivy:
+    uses: ./.github/workflows/reusable-trivy.yml
+
+  tests:
+    uses: ./.github/workflows/reusable-node-tests.yml
