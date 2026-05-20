@@ -6,7 +6,7 @@ function getJwtSecret() {
   }
 
   if (jwtSecret.length < 32) {
-    throw new Error("JWT_SECRET must be at least 32 characters long");
+    throw new Error("JWT_SECRET must be at least 32 characters long for security reasons");
   }
 
   return jwtSecret;
