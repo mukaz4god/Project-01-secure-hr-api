@@ -10,11 +10,13 @@ data "aws_ami" "amazon_linux" {
 
 resource "aws_ecr_repository" "app" {
   name                 = "${var.project_name}-${var.environment}"
-  image_tag_mutability = "MUTABLE"
+  image_tag_mutability = "IMMUTABLE"
 
   image_scanning_configuration {
     scan_on_push = true
   }
+
+
 }
 
 resource "aws_ssm_parameter" "jwt_secret" {
@@ -120,6 +122,10 @@ resource "aws_instance" "app" {
   iam_instance_profile   = aws_iam_instance_profile.ec2_profile.name
   user_data              = file("${path.module}/../user-data/install-docker.sh")
 
+  metadata_options {
+    http_endpoint = "enabled"
+    http_tokens   = "required"
+  }
 
   tags = {
     Name        = "${var.project_name}-${var.environment}-ec2"
