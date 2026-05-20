@@ -1,5 +1,4 @@
 aws_region       = "eu-west-2"
 project_name     = "secure-hr-api"
 environment      = "dev"
-allowed_ssh_cidr = ""
 jwt_secret       = "replace-with-strong-32-character-secret"
