@@ -4,3 +4,5 @@ security/reports/
 .terraform/
 *.tfstate
 *.tfstate.*
+infra/aws/ec2/terraform.tfvars
+infra/aws/ec2/terraform.tfvars.example
