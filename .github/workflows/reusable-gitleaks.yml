@@ -1,3 +1,16 @@
+# name: Reusable Gitleaks
+
+# on:
+#   workflow_call:
+
+# jobs:
+#   gitleaks:
+#     runs-on: ubuntu-latest
+#     steps:
+#       - name: Checkout Code
+#         uses: actions/checkout@v4
+#       - name: Run Gitleaks
+#         uses: gitleaks/gitleaks-action@v2
 name: Reusable Gitleaks
 
 on:
@@ -6,8 +19,15 @@ on:
 jobs:
   gitleaks:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout Code
+      - name: Checkout
         uses: actions/checkout@v4
-      - name: Run Gitleaks
-        uses: gitleaks/gitleaks-action@v2
+
+      - name: Run Gitleaks on working tree only
+        run: |
+          docker run --rm -v "$PWD:/repo" zricethezav/gitleaks:latest detect \
+            --source=/repo \
+            --no-git \
+            --redact \
+            --verbose
