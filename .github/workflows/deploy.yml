@@ -17,7 +17,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Configure AWS credentials
+      - name: Configure AWS credentials via OIDC
         uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
@@ -27,13 +27,70 @@ jobs:
         uses: aws-actions/amazon-ecr-login@v2
 
       - name: Build Docker image
-        run: |
-          docker build -t secure-hr-api:latest ./app
+        run: docker build -t secure-hr-api:latest ./app
 
-      - name: Tag image
-        run: |
-          docker tag secure-hr-api:latest ${{ secrets.ECR_REPOSITORY }}:latest
+      - name: Tag Docker image
+        run: docker tag secure-hr-api:latest ${{ secrets.ECR_REPOSITORY }}:latest
 
-      - name: Push image
+      - name: Push Docker image to ECR
+        run: docker push ${{ secrets.ECR_REPOSITORY }}:latest
+
+      - name: Configure SSH key
         run: |
-          docker push ${{ secrets.ECR_REPOSITORY }}:latest
+          mkdir -p ~/.ssh
+          echo "${{ secrets.EC2_SSH_KEY }}" > ~/.ssh/ec2_key.pem
+          chmod 600 ~/.ssh/ec2_key.pem
+          ssh-keyscan -H ${{ secrets.EC2_HOST }} >> ~/.ssh/known_hosts
+
+      - name: Deploy container on EC2
+        run: |
+          ssh -i ~/.ssh/ec2_key.pem ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
+            set -e
+
+            AWS_REGION="${{ secrets.AWS_REGION }}"
+            ECR_REPOSITORY="${{ secrets.ECR_REPOSITORY }}"
+            PARAMETER_NAME="/secure-hr-api/dev/JWT_SECRET"
+
+            aws ecr get-login-password --region "$AWS_REGION" | docker login --username AWS --password-stdin "$ECR_REPOSITORY"
+
+            docker pull "$ECR_REPOSITORY:latest"
+
+            docker stop secure-hr-api || true
+            docker rm secure-hr-api || true
+
+            JWT_SECRET=$(aws ssm get-parameter \
+              --name "$PARAMETER_NAME" \
+              --with-decryption \
+              --query Parameter.Value \
+              --output text)
+
+            docker run -d \
+              --name secure-hr-api \
+              --restart unless-stopped \
+              -p 3000:3000 \
+              -e JWT_SECRET="$JWT_SECRET" \
+              "$ECR_REPOSITORY:latest"
+
+            docker ps
+          EOF
+
+      # - name: Configure AWS credentials
+      #   uses: aws-actions/configure-aws-credentials@v4
+      #   with:
+      #     role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+      #     aws-region: ${{ secrets.AWS_REGION }}
+
+      # - name: Login to ECR
+      #   uses: aws-actions/amazon-ecr-login@v2
+
+      # - name: Build Docker image
+      #   run: |
+      #     docker build -t secure-hr-api:latest ./app
+
+      # - name: Tag image
+      #   run: |
+      #     docker tag secure-hr-api:latest ${{ secrets.ECR_REPOSITORY }}:latest
+
+      # - name: Push image
+      #   run: |
+      #     docker push ${{ secrets.ECR_REPOSITORY }}:latest
