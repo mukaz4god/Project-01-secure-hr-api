@@ -40,7 +40,8 @@ jobs:
           mkdir -p ~/.ssh
           echo "${{ secrets.EC2_SSH_KEY }}" > ~/.ssh/ec2_key.pem
           chmod 600 ~/.ssh/ec2_key.pem
-          ssh-keyscan -H ${{ secrets.EC2_HOST }} >> ~/.ssh/known_hosts
+          ssh-keyscan -T 30 -H ${{ secrets.EC2_HOST }} >> ~/.ssh/known_hosts
+         # ssh-keyscan -H ${{ secrets.EC2_HOST }} >> ~/.ssh/known_hosts
 
       - name: Deploy container on EC2
         run: |
