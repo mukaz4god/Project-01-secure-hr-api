@@ -36,13 +36,21 @@ resource "aws_security_group" "app_sg" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
+  # ingress {
+  #   description = "Restricted SSH access"
+  #   from_port   = 22
+  #   to_port     = 22
+  #   protocol    = "tcp"
+  #   cidr_blocks = [var.allowed_ssh_cidr]
+  # }
+  # the below is just use temporarily for deployment, should be removed after deployment is done
   ingress {
-    description = "Restricted SSH access"
-    from_port   = 22
-    to_port     = 22
-    protocol    = "tcp"
-    cidr_blocks = [var.allowed_ssh_cidr]
-  }
+  description = "SSH access for deployment"
+  from_port   = 22
+  to_port     = 22
+  protocol    = "tcp"
+  cidr_blocks = ["0.0.0.0/0"]
+}
 
   egress {
     description = "Allow outbound internet access"
@@ -98,7 +106,18 @@ resource "aws_iam_policy" "ec2_policy" {
           "ssm:GetParameter"
         ]
         Resource = aws_ssm_parameter.jwt_secret.arn
-      }
+      },
+      {
+      Effect = "Allow"
+      Action = [
+        "logs:CreateLogGroup",
+        "logs:CreateLogStream",
+        "logs:PutLogEvents",
+        "logs:DescribeLogGroups",
+        "logs:DescribeLogStreams"
+      ]
+      Resource = "*"
+    }
     ]
   })
 }
@@ -132,4 +151,9 @@ resource "aws_instance" "app" {
     Environment = var.environment
     ManagedBy   = "Terraform"
   }
+}
+
+resource "aws_cloudwatch_log_group" "app_logs" {
+  name              = "/${var.project_name}/${var.environment}/application"
+  retention_in_days = 7
 }
