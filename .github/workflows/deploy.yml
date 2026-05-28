@@ -35,7 +35,7 @@ jobs:
       - name: Push Docker image to ECR
         run: docker push ${{ secrets.ECR_REPOSITORY }}:latest
      
-      - name: Deploy via SSM Run Command
+      - name: Deploy via SSM Run Command.
         run: |
             COMMAND_ID=$(aws ssm send-command \
               --document-name "AWS-RunShellScript" \
@@ -55,7 +55,7 @@ jobs:
               --query "Command.CommandId" \
               --output text)
             echo "SSM Command ID: $COMMAND_ID"
-            
+
       # - name: Configure SSH key
       #   run: |
       #     mkdir -p ~/.ssh
