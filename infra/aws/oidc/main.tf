@@ -55,7 +55,9 @@ resource "aws_iam_policy" "github_actions_policy" {
           "ecr:CompleteLayerUpload",
           "ecr:InitiateLayerUpload",
           "ecr:PutImage",
-          "ecr:UploadLayerPart"
+          "ecr:UploadLayerPart",
+          "ssm:SendCommand",
+          "ssm:GetCommandInvocation"
         ]
         Resource = "*"
       },
