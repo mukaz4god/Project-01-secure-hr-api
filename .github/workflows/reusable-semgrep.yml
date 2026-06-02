@@ -13,6 +13,6 @@ jobs:
       - name: Run Semgrep
         uses: returntocorp/semgrep-action@v1
         with: 
-          config: |
-            'p/owasp-top-ten'
+          config: >
+            p/owasp-top-ten
             semgrep-rules/custom-rules.yml
