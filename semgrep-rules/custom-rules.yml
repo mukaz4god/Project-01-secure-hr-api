@@ -1,0 +1,25 @@
+rules:
+  - id: hardcoded-jwt-secret
+    patterns:
+      - pattern: |
+          jwt.sign(..., "$SECRET", ...)
+    message: Hardcoded JWT secret detected
+    severity: ERROR
+    languages:
+      - javascript
+  - id: sensitive-console-log
+    patterns:
+      - pattern: console.log(...)
+    message: Review console logging for sensitive information exposure
+    severity: WARNING
+    languages:
+      - javascript
+  - id: potential-ssrf
+    patterns:
+      - pattern-either:
+          - pattern: axios.get($URL)
+          - pattern: fetch($URL)
+    message: Review outbound requests for SSRF risks
+    severity: WARNING
+    languages:
+      - javascript
