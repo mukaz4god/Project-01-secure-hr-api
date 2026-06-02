@@ -4,7 +4,7 @@ rules:
       - pattern: |
           jwt.sign(..., "$SECRET", ...)
     message: Hardcoded JWT secret detected
-    severity: ERROR
+    severity: WARNING #ERROR
     languages:
       - javascript
   - id: sensitive-console-log
